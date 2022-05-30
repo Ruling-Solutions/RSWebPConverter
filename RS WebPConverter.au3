@@ -5,7 +5,7 @@
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_Res_Comment=Convert WebP animated images to MP4.
 #AutoIt3Wrapper_Res_Description=Convert WebP animated images to MP4
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.1
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.2
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=RSWebPConverter
 #AutoIt3Wrapper_Res_ProductVersion=1.0
@@ -14,8 +14,8 @@
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 #include <File.au3>
-#include '..\AU3_Common\RS.au3'
-#include '..\AU3_Common\RS_INI.au3'
+#include '..\Common\RS.au3'
+#include '..\Common\RS_INI.au3'
 
 Opt('MustDeclareVars', 1)
 
@@ -75,7 +75,7 @@ If INI_valueLoad($INI, 'General', 'CheckWebPinfoEXE', '0') = '1' And Not FileExi
 EndIf
 
 ; Get WebP filename
-$sWEBPfile = RS_cmdLine()
+$sWEBPfile = RS_cmdLine(True)
 If StringLen($sWEBPfile) = 0 Then
   Local $sDlg = INI_valueLoad($LNG, 'General', '001', 'WebP animated image') & ':'
   While 1
@@ -84,6 +84,7 @@ If StringLen($sWEBPfile) = 0 Then
     If FileExists($sWEBPfile) Then ExitLoop
   WEnd
 EndIf
+$sWEBPfile = RS_quote($sWEBPfile)
 
 ; Get frames data
 $iDurations = _countFrames($sWEBPfile, $iWidth, $iHeight)
@@ -169,7 +170,7 @@ Func _countFrames($pFile, ByRef $pWidth, ByRef $pHeight, $pMsg = '')
   Local $sLines
   Local $sFrameData
 
-  $sLines = RS_shell($EXE_webpmux, ' -info ' & RS_quote($pFile), '', $pMsg)
+  $sLines = RS_shell($EXE_webpmux, ' -info ' & $pFile, '', $pMsg)
   If IsArray($sLines) Then
     For $sLine In $sLines
       If StringLeft($sLine, 13) = 'Canvas size: ' Then
