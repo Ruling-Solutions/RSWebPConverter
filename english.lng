@@ -1,0 +1,17 @@
+﻿[General]
+001=WebP animated image
+002=File exists
+003=Video "%1" already exists.\nOverwrite?
+004=Wait. Extracting %1 frames...
+005=Wait. Creating video...
+006=Done!
+[Error]
+001=Error
+002=Missing files, check instalation.
+003=Error creating file "%1".
+004=No chunks found in file "%1".
+005=No frames found in file "%1".
+006=Error creating concatenation file.
+007=Error extracting frames from file "%1".
+008=Error getting info from file "%1".
+009=Errors found in file "%1".

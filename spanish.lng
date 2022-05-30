@@ -1,0 +1,17 @@
+﻿[General]
+001=Imagen animada WebP
+002=Fichero existente
+003=El video "%1" existe.\n¿Sobreescribir?
+004=Espere. Extrayendo %1 imágenes...
+005=Espere. Creando video...
+006=Done!
+[Error]
+001=Error
+002=Faltan ficheros, revise la instalación.
+003=Error al crear el fichero "%1".
+004=No se encontró chunks en el fichero "%1".
+005=No se encontró imágenes en el fichero "%1".
+006=Error al crear el fichero de concatenactión.
+007=Error al extraer imágenes del fichero "%1".
+008=Error al obtener información del fichero "%1".
+009=Se encontraron errores en el fichero "%1".
