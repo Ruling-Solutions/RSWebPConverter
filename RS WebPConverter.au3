@@ -5,7 +5,7 @@
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_Res_Comment=Convert WebP animated images to MP4.
 #AutoIt3Wrapper_Res_Description=Convert WebP animated images to MP4
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.1
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.0
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=RSWebPConverter
 #AutoIt3Wrapper_Res_ProductVersion=1.0
@@ -14,8 +14,8 @@
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 #include <File.au3>
-#include '..\au3_Common\RS.au3'
-#include '..\au3_Common\RS_INI.au3'
+#include '..\AU3_Common\RS.au3'
+#include '..\AU3_Common\RS_INI.au3'
 
 Opt('MustDeclareVars', 1)
 
@@ -44,6 +44,7 @@ If FileExists($INI) Then
 Else
   $LNG = 'English'
   INI_valueWrite($INI, 'General', 'LNG', $LNG)
+  INI_valueWrite($INI, 'General', 'CheckWebPinfoEXE', '0')
 EndIf
 $LNG = @ScriptDir & '\' & RS_fileNameInfo($LNG, 1) & '.lng'
 
@@ -66,20 +67,24 @@ If Not FileExists($LNG) Then
 EndIf
 
 ; Check executables
-If Not FileExists($EXE_anim_dump) Or Not FileExists($EXE_webpinfo) Or Not FileExists($EXE_webpmux) Or Not FileExists($EXE_ffmpeg) Then
-	MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), INI_valueLoad($LNG, 'Error', '002', 'Missing files, check instalation.'), 3)
-	Exit (1)
+If Not FileExists($EXE_anim_dump) Or Not FileExists($EXE_webpmux) Or Not FileExists($EXE_ffmpeg) Then
+  MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), INI_valueLoad($LNG, 'Error', '002', 'Missing files, check instalation.'), 3)
+  Exit (1)
+EndIf
+If INI_valueLoad($INI, 'General', 'CheckWebPinfoEXE', '0') = '1' And Not FileExists($EXE_webpinfo) Then
+  MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), INI_valueLoad($LNG, 'Error', '002', 'Missing files, check instalation.'), 3)
+  Exit (1)
 EndIf
 
 ; Get WebP filename
 $sWEBPfile = RS_cmdLine()
 If StringLen($sWEBPfile) = 0 Then
   Local $sDlg = INI_valueLoad($LNG, 'General', '001', 'WebP animated image') & ':'
-	While 1
-		$sWEBPfile = InputBox(RS_removeExt(@ScriptName), $sDlg, $sWEBPfile, '', 300, 130, @DesktopWidth - 320, @DesktopHeight - 180)
-		If @error Then Exit(0)
-		If FileExists($sWEBPfile) Then ExitLoop
-	WEnd
+  While 1
+    $sWEBPfile = InputBox(RS_removeExt(@ScriptName), $sDlg, $sWEBPfile, '', 300, 130, @DesktopWidth - 320, @DesktopHeight - 180)
+    If @error Then Exit(0)
+    If FileExists($sWEBPfile) Then ExitLoop
+  WEnd
 EndIf
 
 ; Get frames data
@@ -90,7 +95,7 @@ $sConcatFile = _createConcat($iDurations, $TMPdir)
 ; Create video filename and check if exists
 $sMP4file = RS_removeExt($sWEBPfile) & '.mp4'
 If FileExists($sMP4file) Then
-	If MsgBox(36, INI_valueLoad($LNG, 'General', '002', 'File exists'), StringReplace(INI_valueLoad($LNG, 'General', '003', 'Video "%1" already exists.\nOverwrite?'), '%1', $sMP4file)) <> 6 Then Exit
+  If MsgBox(36, INI_valueLoad($LNG, 'General', '002', 'File exists'), StringReplace(INI_valueLoad($LNG, 'General', '003', 'Video "%1" already exists.\nOverwrite?'), '%1', $sMP4file)) <> 6 Then Exit
 EndIf
 
 ; Extract PNG images
