@@ -5,7 +5,7 @@
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_Res_Comment=Convert WebP animated images to MP4.
 #AutoIt3Wrapper_Res_Description=Convert WebP animated images to MP4
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.2
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.1
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=RSWebPConverter
 #AutoIt3Wrapper_Res_ProductVersion=1.0
@@ -14,17 +14,17 @@
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 #include <File.au3>
-#include '..\Common\RS.au3'
-#include '..\Common\RS_INI.au3'
+#include '..\AU3_Common\RS.au3'
+#include '..\AU3_Common\RS_INI.au3'
 
 Opt('MustDeclareVars', 1)
 
 ; Constants & variables
 Local Const $Path = RS_fileNameValid(@ScriptDir, 2)
-Local Const $EXE_anim_dump = $Path & 'anim_dump.exe'
-Local Const $EXE_webpinfo = $Path & 'webpinfo.exe'
-Local Const $EXE_webpmux = $Path & 'webpmux.exe'
-Local Const $EXE_ffmpeg = $Path & 'ffmpeg.exe'
+Local Const $EXE_anim_dump = RS_quote($Path & 'anim_dump.exe')
+Local Const $EXE_webpinfo = RS_quote($Path & 'webpinfo.exe')
+Local Const $EXE_webpmux = RS_quote($Path & 'webpmux.exe')
+Local Const $EXE_ffmpeg = RS_quote($Path & 'ffmpeg.exe')
 Local Const $TMPdir = RS_removeExt(_TempFile()) & '\'
 Local Const $INI = RS_removeExt(@ScriptName) & '.ini'
 
@@ -37,7 +37,7 @@ Local $sMP4file
 Local $sWEBPfile
 
 ; Check language file
-If FileExists($INI) Then
+If RS_fileExists($INI) Then
   $LNG = INI_valueLoad($INI, 'General', 'LNG', 'English')
 Else
   $LNG = 'English'
@@ -46,7 +46,7 @@ Else
 EndIf
 $LNG = @ScriptDir & '\' & RS_fileNameInfo($LNG, 1) & '.lng'
 
-If Not FileExists($LNG) Then
+If Not RS_fileExists($LNG) Then
   INI_valueWrite($LNG, 'General', '001', 'WebP animated image')
   INI_valueWrite($LNG, 'General', '002', 'File exists')
   INI_valueWrite($LNG, 'General', '003', 'Video "%1" already exists.\nOverwrite?')
@@ -65,11 +65,11 @@ If Not FileExists($LNG) Then
 EndIf
 
 ; Check executables
-If Not FileExists($EXE_anim_dump) Or Not FileExists($EXE_webpmux) Or Not FileExists($EXE_ffmpeg) Then
+If Not RS_fileExists($EXE_anim_dump) Or Not RS_fileExists($EXE_webpmux) Or Not RS_fileExists($EXE_ffmpeg) Then
   MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), INI_valueLoad($LNG, 'Error', '002', 'Missing files, check instalation.'), 3)
   Exit (1)
 EndIf
-If INI_valueLoad($INI, 'General', 'CheckWebPinfoEXE', '0') = '1' And Not FileExists($EXE_webpinfo) Then
+If INI_valueLoad($INI, 'General', 'CheckWebPinfoEXE', '0') = '1' And Not RS_fileExists($EXE_webpinfo) Then
   MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), INI_valueLoad($LNG, 'Error', '002', 'Missing files, check instalation.'), 3)
   Exit (1)
 EndIf
@@ -81,7 +81,7 @@ If StringLen($sWEBPfile) = 0 Then
   While 1
     $sWEBPfile = InputBox(RS_removeExt(@ScriptName), $sDlg, $sWEBPfile, '', 300, 130, @DesktopWidth - 320, @DesktopHeight - 180)
     If @error Then Exit(0)
-    If FileExists($sWEBPfile) Then ExitLoop
+    If RS_fileExists($sWEBPfile) Then ExitLoop
   WEnd
 EndIf
 $sWEBPfile = RS_quote($sWEBPfile)
@@ -92,8 +92,8 @@ If Not IsArray($iDurations) Or $iWidth < 1 Or $iHeight < 1 Or $iDurations[0] = 0
 $sConcatFile = _createConcat($iDurations, $TMPdir)
 
 ; Create video filename and check if exists
-$sMP4file = RS_removeExt($sWEBPfile) & '.mp4'
-If FileExists($sMP4file) Then
+$sMP4file = RS_Trim(RS_removeExt($sWEBPfile), '"') & '.mp4'
+If RS_fileExists($sMP4file) Then
   If MsgBox(36, INI_valueLoad($LNG, 'General', '002', 'File exists'), StringReplace(INI_valueLoad($LNG, 'General', '003', 'Video "%1" already exists.\nOverwrite?'), '%1', $sMP4file)) <> 6 Then Exit
 EndIf
 
@@ -127,7 +127,7 @@ Func _concatMP4($pFile, $pConcat, $pWidth, $pHeight, $pFolder = '', $pMsg = '')
   RS_Run($sCommand, '', $pMsg)
 
   ; Copy temporal video to final dir and delete temporal file
-  FileCopy($sTmpFile, $pFile, 1)
+  FileCopy($sTmpFile, RS_Trim($pFile, '"'), 1)
   If @error Then
     MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), StringReplace(INI_valueLoad($LNG, 'Error', '003', 'Error creating file "%1".'), '%1', $pFile), 3)
     Return False
