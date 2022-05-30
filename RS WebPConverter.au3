@@ -5,7 +5,7 @@
 #AutoIt3Wrapper_Compression=4
 #AutoIt3Wrapper_Res_Comment=Convert WebP animated images to MP4.
 #AutoIt3Wrapper_Res_Description=Convert WebP animated images to MP4
-#AutoIt3Wrapper_Res_Fileversion=1.0.0.0
+#AutoIt3Wrapper_Res_Fileversion=1.0.0.1
 #AutoIt3Wrapper_Res_Fileversion_AutoIncrement=y
 #AutoIt3Wrapper_Res_ProductName=RSWebPConverter
 #AutoIt3Wrapper_Res_ProductVersion=1.0
@@ -26,11 +26,9 @@ Local Const $EXE_webpinfo = $Path & 'webpinfo.exe'
 Local Const $EXE_webpmux = $Path & 'webpmux.exe'
 Local Const $EXE_ffmpeg = $Path & 'ffmpeg.exe'
 Local Const $TMPdir = RS_removeExt(_TempFile()) & '\'
-
 Local Const $INI = RS_removeExt(@ScriptName) & '.ini'
 
 Local $LNG
-
 Local $iDurations
 Local $iHeight
 Local $iWidth
@@ -172,24 +170,29 @@ Func _countFrames($pFile, ByRef $pWidth, ByRef $pHeight, $pMsg = '')
   Local $sFrameData
 
   $sLines = RS_shell($EXE_webpmux, ' -info ' & $pFile, '', $pMsg)
-  For $sLine In $sLines
-    If StringLeft($sLine, 13) = 'Canvas size: ' Then
-      $sLine = StringSplit(StringStripWS(StringTrimLeft($sLine, 13), 8), "x", 2)
-      $pWidth = Number($sLine[0])
-      $pHeight = Number($sLine[1])
-    Else
-      $sLine = RS_LTrim($sLine, ' ')
-      If StringInStr('0123456789', StringLeft($sLine, 1)) Then
-        $sFrameData = RS_Split($sLine)
-        If IsArray($sFrameData) And $sFrameData[0] = 11 Then _ArrayAdd($iFrameDurations, $sFrameData[7])
+  If IsArray($sLines) Then
+    For $sLine In $sLines
+      If StringLeft($sLine, 13) = 'Canvas size: ' Then
+        $sLine = StringSplit(StringStripWS(StringTrimLeft($sLine, 13), 8), "x", 2)
+        $pWidth = Number($sLine[0])
+        $pHeight = Number($sLine[1])
+      Else
+        $sLine = RS_LTrim($sLine, ' ')
+        If StringInStr('0123456789', StringLeft($sLine, 1)) Then
+          $sFrameData = RS_Split($sLine)
+          If IsArray($sFrameData) And $sFrameData[0] = 11 Then _ArrayAdd($iFrameDurations, $sFrameData[7])
+        EndIf
       EndIf
-    EndIf
-  Next
-  $iFrameDurations[0] = UBound($iFrameDurations) - 1
-  If $iFrameDurations[0]< 1 Then
+    Next
+    $iFrameDurations[0] = UBound($iFrameDurations) - 1
+    If $iFrameDurations[0]< 1 Then
+      MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), StringReplace(INI_valueLoad($LNG, 'Error', '005', 'No frames found in file "%1".'), '%1', $pFile), 3)
+    Endif
+    Return $iFrameDurations
+  Else
     MsgBox(16, INI_valueLoad($LNG, 'Error', '001', 'Error'), StringReplace(INI_valueLoad($LNG, 'Error', '005', 'No frames found in file "%1".'), '%1', $pFile), 3)
-  Endif
-  Return $iFrameDurations
+    Return Null
+  EndIf
 EndFunc
 
 ; <=== _createConcat ==============================================================================
