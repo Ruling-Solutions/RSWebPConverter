@@ -169,14 +169,16 @@ Func _countFrames($pFile, ByRef $pWidth, ByRef $pHeight, $pMsg = '')
   Local $sLines
   Local $sFrameData
 
-  $sLines = RS_shell($EXE_webpmux, ' -info ' & $pFile, '', $pMsg)
+  $sLines = RS_shell($EXE_webpmux, ' -info ' & RS_quote($pFile), '', $pMsg)
   If IsArray($sLines) Then
     For $sLine In $sLines
       If StringLeft($sLine, 13) = 'Canvas size: ' Then
+        ; Get canvas sie
         $sLine = StringSplit(StringStripWS(StringTrimLeft($sLine, 13), 8), "x", 2)
         $pWidth = Number($sLine[0])
         $pHeight = Number($sLine[1])
       Else
+        ; Get frames durations
         $sLine = RS_LTrim($sLine, ' ')
         If StringInStr('0123456789', StringLeft($sLine, 1)) Then
           $sFrameData = RS_Split($sLine)
