@@ -10,12 +10,12 @@
 #AutoIt3Wrapper_Res_ProductName=RSWebPConverter
 #AutoIt3Wrapper_Res_ProductVersion=1.0
 #AutoIt3Wrapper_Res_CompanyName=Ruling Solutions
-#AutoIt3Wrapper_Res_LegalCopyright=© 2021, Ruling Solutions
+#AutoIt3Wrapper_Res_LegalCopyright=Â© 2021, Ruling Solutions
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
 
 #include <File.au3>
-#include '..\Common\RS.au3'
-#include '..\Common\RS_INI.au3'
+#include '..\au3_Common\RS.au3'
+#include '..\au3_Common\RS_INI.au3'
 
 Opt('MustDeclareVars', 1)
 
